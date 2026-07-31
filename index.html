@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>高质量数据专项推进总览</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <!-- 离线依赖库 -->
+  <script src="lib/xlsx.full.min.js"></script>
+  <script src="lib/echarts.min.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    
+    <!-- 顶部 Header Bar -->
+    <header class="header-bar">
+      <div class="header-left">
+        <h1 class="dashboard-title">高质量数据专项推进总览</h1>
+      </div>
+      <div class="header-right">
+        <div class="control-group">
+          <label for="projectSelect" class="control-label">专项选择</label>
+          <select id="projectSelect" class="custom-select">
+            <option value="ALL">全部专项</option>
+            <option value="EBP">EBP</option>
+            <option value="HGP2">HGP2</option>
+            <option value="肿瘤专项">肿瘤专项</option>
+            <option value="虚拟细胞">虚拟细胞</option>
+            <option value="生物制造">生物制造</option>
+          </select>
+        </div>
+
+        <div class="date-badge">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>数据截至：<span id="asOfDate">2026年7月</span></span>
+        </div>
+
+        <button id="reloadBtn" class="btn-secondary" title="重新读取固定路径 Excel">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+          </svg>
+          刷新数据
+        </button>
+
+        <button id="uploadTriggerBtn" class="btn-outline" title="备用：选择本地 Excel 文件">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          导入表格
+        </button>
+        <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;">
+      </div>
+    </header>
+
+    <!-- 顶部 3 大核心 KPI 卡片区 -->
+    <section class="kpi-grid">
+      <!-- 1. 样本进度卡片 -->
+      <div class="kpi-card card-sample">
+        <div class="kpi-header">
+          <span class="kpi-icon sample-icon">
+            <svg class="kpi-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55A1 1 0 0 0 5.607 22h12.786a1 1 0 0 0 .886-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/>
+              <path d="M8.5 2h7"/>
+              <path d="M7 16h10"/>
+            </svg>
+          </span>
+          <span class="kpi-title">样本进度</span>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-info">
+            <div class="kpi-metric" id="kpiSampleRate">0.0%</div>
+            <div class="kpi-subtext" id="kpiSampleSub">0 / 0 例</div>
+          </div>
+          <div class="kpi-sparkline" id="kpiSampleSparkline"></div>
+        </div>
+      </div>
+
+      <!-- 2. 数据进度卡片 -->
+      <div class="kpi-card card-data">
+        <div class="kpi-header">
+          <span class="kpi-icon data-icon">
+            <svg class="kpi-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+              <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/>
+            </svg>
+          </span>
+          <span class="kpi-title">数据进度</span>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-info">
+            <div class="kpi-metric text-green" id="kpiDataProdRate">0.0%</div>
+            <div class="kpi-subtext" id="kpiDataProdSub">0.00 / 0.00 PB</div>
+          </div>
+          <div class="kpi-sparkline" id="kpiDataSparkline"></div>
+        </div>
+      </div>
+
+      <!-- 3. DMP与表型治理卡片 -->
+      <div class="kpi-card card-dmp">
+        <div class="kpi-header">
+          <span class="kpi-icon dmp-icon">
+            <svg class="kpi-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.8 17 5 19 5a1 1 0 0 1 1 1z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </span>
+          <span class="kpi-title">DMP与表型治理</span>
+        </div>
+        <div class="kpi-dual-columns">
+          <div class="kpi-col">
+            <div class="col-label">DMP提交</div>
+            <div class="col-value text-green" id="kpiDmpRate">0.0%</div>
+            <div class="col-subtext" id="kpiDmpSubtext">0 / 0 个项目</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill fill-green" id="kpiDmpBar" style="width: 0%;"></div>
+            </div>
+          </div>
+          <div class="kpi-col">
+            <div class="col-label">表型汇交</div>
+            <div class="col-value text-teal" id="kpiPhenoRate">0.0%</div>
+            <div class="col-subtext" id="kpiPhenoSubtext">0 / 0 个项目</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill fill-teal" id="kpiPhenoBar" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 中部 2 大核心图表/矩阵面板区 -->
+    <section class="middle-grid">
+      <!-- 1. 专项进度总览 Panel -->
+      <div class="panel-card panel-matrix">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <span class="panel-title-icon text-primary">
+              <svg class="title-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2"/>
+                <path d="M3 9h18"/>
+                <path d="M3 15h18"/>
+                <path d="M9 3v18"/>
+                <path d="M15 3v18"/>
+              </svg>
+            </span>
+            <span>专项进度总览</span>
+          </h2>
+        </div>
+        <div class="table-container">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>专项</th>
+                <th style="text-align: right; padding-right: 14px;">合作方数</th>
+                <th>合同签署率</th>
+                <th>样本进度</th>
+                <th>数据生产</th>
+                <th>DMP / 表型</th>
+              </tr>
+            </thead>
+            <tbody id="projectMatrixBody">
+              <!-- 动态填充 -->
+            </tbody>
+          </table>
+        </div>
+        <!-- 移动端卡片容器 -->
+        <div class="matrix-cards-container" id="projectMatrixCards">
+          <!-- 动态填充移动端卡片 -->
+        </div>
+      </div>
+
+      <!-- 2. 专项完成度排名 Panel -->
+      <div class="panel-card panel-rank">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <span class="panel-title-icon text-amber">
+              <svg class="title-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                <path d="M4 22h16"/>
+                <path d="M10 14.66V17c0 .55-.45 1-1 1H7.5"/>
+                <path d="M14 14.66V17c0 .55.45 1 1 1h1.5"/>
+                <path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/>
+                <path d="M12 17v5"/>
+              </svg>
+            </span>
+            <span>专项完成度排名</span>
+          </h2>
+          <div class="rank-toggle-group">
+            <button class="rank-toggle-btn active" data-metric="data">按数据生产</button>
+            <button class="rank-toggle-btn" data-metric="sample">按样本进度</button>
+            <button class="rank-toggle-btn" data-metric="contract">按合同签署</button>
+          </div>
+        </div>
+        <div class="chart-box" id="rankChart"></div>
+      </div>
+    </section>
+
+    <!-- 底部专项分析明细表 -->
+    <section class="panel-card panel-drilldown">
+      <div class="panel-header drilldown-header">
+        <div class="header-title-group">
+          <h2 class="panel-title">
+            <span class="panel-title-icon text-blue">
+              <svg class="title-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m2 15 6-6 4 4 10-10"/>
+                <path d="M9 18v-2"/>
+                <path d="M4 20v-3"/>
+                <path d="M14 16v-5"/>
+                <path d="M19 14V4"/>
+              </svg>
+            </span>
+            <span>专项分析</span>
+          </h2>
+          <span class="drilldown-sub" id="drilldownSubtitle"> — 组学维度明细</span>
+        </div>
+
+        <div class="tab-buttons inline-tabs">
+          <button class="tab-btn active" data-tab="omics">组学进展</button>
+          <button class="tab-btn" data-tab="sampletype">样本类型</button>
+          <button class="tab-btn" data-tab="contract">合同进展</button>
+        </div>
+
+        <div class="header-right-tools">
+          <div class="search-wrapper">
+            <svg class="search-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input type="text" id="tableSearchInput" placeholder="搜索名称、合同、样本类型..." class="search-input">
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container drilldown-table-wrap">
+        <table class="drilldown-table" id="drilldownTable">
+          <thead id="drilldownThead">
+            <!-- 动态生成 -->
+          </thead>
+          <tbody id="drilldownTbody">
+            <!-- 动态生成 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 移动端专项分析卡片容器 -->
+      <div class="drilldown-cards-container" id="drilldownCards">
+        <!-- 动态生成移动端卡片 -->
+      </div>
+    </section>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

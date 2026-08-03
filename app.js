@@ -384,7 +384,7 @@ function renderProjectMatrix(data) {
   const cardsContainer = document.getElementById('projectMatrixCards');
   if (cardsContainer) cardsContainer.innerHTML = '';
 
-  const projects = ['EBP', 'HGP2', '肿瘤专项', '虚拟细胞', '生物制造'];
+  const projects = ['EBP', 'HGP2', '肿瘤专项', '时空细胞模型', '生物制造'];
 
   projects.forEach((projName) => {
     const projRows = data.filter((r) => String(r[0]).trim() === projName);

@@ -401,15 +401,15 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 16px;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
-.matrix-table th:nth-child(1), .matrix-table td:nth-child(1) { width: 150px; }
+.matrix-table th:nth-child(1), .matrix-table td:nth-child(1) { width: 125px; }
 .matrix-table th:nth-child(2), .matrix-table td:nth-child(2) { width: 95px; text-align: right; padding-right: 14px; }
-.matrix-table th:nth-child(3), .matrix-table td:nth-child(3) { width: calc((100% - 245px) / 4); }
-.matrix-table th:nth-child(4), .matrix-table td:nth-child(4) { width: calc((100% - 245px) / 4); }
-.matrix-table th:nth-child(5), .matrix-table td:nth-child(5) { width: calc((100% - 245px) / 4); }
-.matrix-table th:nth-child(6), .matrix-table td:nth-child(6) { width: calc((100% - 245px) / 4); }
+.matrix-table th:nth-child(3), .matrix-table td:nth-child(3) { width: calc((100% - 220px) / 4); }
+.matrix-table th:nth-child(4), .matrix-table td:nth-child(4) { width: calc((100% - 220px) / 4); }
+.matrix-table th:nth-child(5), .matrix-table td:nth-child(5) { width: calc((100% - 220px) / 4); }
+.matrix-table th:nth-child(6), .matrix-table td:nth-child(6) { width: calc((100% - 220px) / 4); }
 
 .matrix-table th {
   background-color: #f8fafc;

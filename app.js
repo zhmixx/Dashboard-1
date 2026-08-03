@@ -241,7 +241,7 @@ function getProjectTagHtml(projName) {
     'EBP': { bg: '#e0f2fe', color: '#0369a1', border: '#bae6fd' },       // 天蓝/深蓝
     'HGP2': { bg: '#d1fae5', color: '#047857', border: '#a7f3d0' },      // 翡翠绿
     '肿瘤专项': { bg: '#ffe4e6', color: '#be123c', border: '#fecdd3' },  // 玫瑰红/绯红
-    '虚拟细胞': { bg: '#f3e8ff', color: '#6b21a8', border: '#e9d5ff' },  // 雅致紫
+    '时空细胞模型': { bg: '#f3e8ff', color: '#6b21a8', border: '#e9d5ff' },  // 雅致紫
     '生物制造': { bg: '#fef3c7', color: '#b45309', border: '#fde68a' }   // 暖琥珀/暖橙
   };
 
@@ -558,7 +558,7 @@ function selectProjectFilter(projName) {
 // 3. 渲染专项完成度排名 Panel
 function renderRankChart(data) {
   if (!rankChart) return;
-  const projects = ['EBP', 'HGP2', '虚拟细胞', '生物制造', '肿瘤专项'];
+  const projects = ['EBP', 'HGP2', '时空细胞模型', '生物制造', '肿瘤专项'];
 
   const rankData = projects.map((pName) => {
     const pRows = data.filter((r) => String(r[0]).trim() === pName);

@@ -401,7 +401,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 16px;
-  table-layout: auto;
+  table-layout: fixed;
 }
 
 .matrix-table th:nth-child(1), .matrix-table td:nth-child(1) { width: 125px; }

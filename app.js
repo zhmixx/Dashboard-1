@@ -593,7 +593,7 @@ function renderRankChart(data) {
   const isMobile = window.innerWidth <= 768;
   const option = {
     grid: {
-      left: isMobile ? '24%' : '15%',
+      left: isMobile ? '24%' : '22%',
       right: isMobile ? '18%' : '24%',
       top: '8%',
       bottom: '5%'
